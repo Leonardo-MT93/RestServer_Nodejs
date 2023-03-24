@@ -8,7 +8,7 @@ class Server {
     constructor(){
         this.app = express();
         //Hacemos que el puerto sea visible
-        this.port = process.env.PORT;
+        this.port = process.env.PORT || 3000;
         this.usuariosPath = '/api/users';
         //Middlewares son funciones que agregan otra funcionalidad al webserver. Se ejecutan siempre que levantamos el servidor
         this.middlewares();
