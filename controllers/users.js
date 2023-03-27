@@ -1,35 +1,73 @@
-const { response} = require('express')
+const { response} = require('express');
+const bcryptjs = require('bcryptjs');
+
+const User = require('../models/user');
+
 
 
 //Definimos que hace cada una de las rutas
-const usuariosGet = (req, res = response) => {
+const usuariosGet = async(req, res = response) => {
     // const query = req.query;
-    const {q, nombre = 'No name', apikey, page, limit} = req.query;
+    // const {q, nombre = 'No name', apikey, page, limit} = req.query;
+    const {limite = 5, desde = 0} = req.query;
+    //USUARIOS ACTIVOS CON EL ESTADO EN TRUE
+    const query = {estado : true};
+    // const users = await User.find(query)
+    // .skip(desde)
+    // .limit(limite);
+
+    // const total = await User.countDocuments(query);
+
+    // SE EJECUTAN AMBAS PROMESAS EN SIMULTANEO ----- y utilizamos la DESESTRUCUTRACION ------- SUPER UTIL YA QUE SIMPLIFICAMOS EL TIEMPO A LA MITAD
+    const [total, users] = await Promise.all([
+        User.countDocuments(query),
+        User.find(query)
+            .skip(desde)
+            .limit(limite)  
+    ])
     res.json({
-        msg: "get API - controlador",
-        q,
-        nombre,
-        apikey,
-        page,
-        limit
+        total,
+        users
     });
 }
 
-const usuariosPost = (req, res = response) => {
+const usuariosPost = async(req, res = response) => {
+    
 
-    const body = req.body;
+    const {nombre, correo, contraseña, rol} = req.body;
+    const user = new User({nombre, correo, contraseña, rol});
+
+    //Verificar si el correo existe
+    //Encriptar la contraseña
+    const salt = bcryptjs.genSaltSync();
+    user.contraseña = bcryptjs.hashSync(contraseña, salt);
+
+    //Guardar en DB
+    await user.save();
+
+    //Evitamos mostrar la contraseña del usuario
+
+
     res.json({
-        msg: "post API - controlador",
-        body
+        user
     });
 }
 
-const usuariosPut = (req, res = response) => {
+const usuariosPut = async(req, res = response) => {
 //PARAMETROS Y NOMBRE DE LA RUTA = :id
-    const id = req.params.id;
+    const {id} = req.params;
+    const {_id, contraseña, google, correo, ...resto} = req.body;
+    //TODO VALDIAR CONTRA LA BASE DE DATOS
+
+    if( contraseña){
+        const salt = bcryptjs.genSaltSync();
+        resto.contraseña = bcryptjs.hashSync(contraseña, salt);
+    }
+
+    const userDB = await User.findByIdAndUpdate(id, resto);
+
     res.json({
-        msg: "put API - controlador",
-        id
+        userDB
     });
 }
 
@@ -39,9 +77,21 @@ const usuariosPatch = (req, res = response) => {
     });
 }
 
-const usuariosDelete = (req, res = response) => {
+const usuariosDelete = async(req, res = response) => {
+
+    const {id} = req.params;
+    //BORRAR FISICAMENTE
+    
+    // const user = await User.findByIdAndDelete(id);
+
+
+    //Borrado pero en realidad le sacamos el estado a FALSE --- RECOMENDADO
+    const user = await User.findByIdAndUpdate(id, {estado: false});
+
+
+
     res.json({
-        msg: "delete API - controlador"
+        user
     });
 }
 module.exports = {
