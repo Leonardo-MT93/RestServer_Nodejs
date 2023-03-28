@@ -80,15 +80,17 @@ const usuariosPatch = (req, res = response) => {
 const usuariosDelete = async(req, res = response) => {
 
     const {id} = req.params;
-    //BORRAR FISICAMENTE
-    
-    // const user = await User.findByIdAndDelete(id);
 
+    const uid = req.uid;
+
+    // const user = await User.findByIdAndDelete(id); NO DEBEMOS ELIMINAR COMPLETAMENTE AL USUARIO DE NUESTRA BD
 
     //Borrado pero en realidad le sacamos el estado a FALSE --- RECOMENDADO
     const user = await User.findByIdAndUpdate(id, {estado: false});
-
-
+    //Recogiendo el uid del token, busco entre los usuarios almacenados los datos del mismo.
+    // const userAuth = await User.findById(uid);
+    //Obtenemos por medio de la request al usuario autenticado - Validar.jtw
+    // const userAuth = req.user;
 
     res.json({
         user

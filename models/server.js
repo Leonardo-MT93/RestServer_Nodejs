@@ -11,7 +11,7 @@ class Server {
         //Hacemos que el puerto sea visible
         this.port = process.env.PORT;
         this.usuariosPath = '/api/users';
-
+        this.authPath = '/api/auth';
         //Conectar a base de datos
         this.conectarDB();
 
@@ -40,7 +40,7 @@ class Server {
     routes(){
         //Middleware condicional que comienza con el path /api/users = this.usuariosPath
         this.app.use(this.usuariosPath, require('../routes/user'));
-
+        this.app.use(this.authPath, require('../routes/auth'));
     }
 
 

@@ -36,7 +36,8 @@ const userSchema = Schema({
 //Podemos crear metodos y/o modificar los existentes. En este caso eliminamos de pantalla la contraseña y la version al utilizar el .json
 
 userSchema.methods.toJSON = function(){
-    const {__v, contraseña, ...user} = this.toObject();
+    const {__v, contraseña, _id, ...user} = this.toObject();
+    user.uid = _id;
     return user;
 }
 
