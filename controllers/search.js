@@ -47,17 +47,19 @@ const buscarProductos = async(termino ='', res = response)=>{
     const esMongoID = ObjectId.isValid(termino);
 
     if(esMongoID){
-        const producto = await Product.findById(termino).populate('categoria', 'nombre');
+        const producto = await Product.find({
+            $or: [{_id: termino}, {categoria: termino}]
+        }).populate('categoria', 'nombre');
         return res.json({
             results: (producto) ? [producto] : []
         })
     }
-    
+
     //Busqueda insensible con regex
     const regex  = new RegExp(termino, 'i');
 
     const producto = await Product.find({ //Si reemplazo el find por el count puedo Count me pasa la cantidad de busquedas encontradas
-        $or: [{nombre: regex}, {descripcion: regex}], 
+        $or: [{nombre: regex}, {descripcion: regex}, {'categoria.nombre': regex}], 
         $and: [{estado: true}] //Tiene que estar en true los resultados de la busqueda
     }).populate('categoria', 'nombre');
     res.json({
@@ -65,6 +67,7 @@ const buscarProductos = async(termino ='', res = response)=>{
     })
 }
 
+  
 
 const buscar = (req, res = response) => {
 
