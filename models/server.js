@@ -10,8 +10,17 @@ class Server {
         this.app = express();
         //Hacemos que el puerto sea visible
         this.port = process.env.PORT;
-        this.usuariosPath = '/api/users';
-        this.authPath = '/api/auth';
+        //Forma simplificada
+        this.paths = {
+            auth: '/api/auth',
+            search: '/api/search',
+            users: '/api/users',
+            categories: '/api/categories',
+            products: '/api/products'
+        }
+        // this.usuariosPath = '/api/users';
+        // this.authPath = '/api/auth';
+
         //Conectar a base de datos
         this.conectarDB();
 
@@ -39,8 +48,12 @@ class Server {
     //Metodo para definir rutas
     routes(){
         //Middleware condicional que comienza con el path /api/users = this.usuariosPath
-        this.app.use(this.usuariosPath, require('../routes/user'));
-        this.app.use(this.authPath, require('../routes/auth'));
+        this.app.use(this.paths.users, require('../routes/user'));
+        this.app.use(this.paths.auth, require('../routes/auth'));
+        this.app.use(this.paths.search, require('../routes/search'));
+        this.app.use(this.paths.products, require('../routes/products'));
+        this.app.use(this.paths.categories, require('../routes/categories'));
+
     }
 
 
