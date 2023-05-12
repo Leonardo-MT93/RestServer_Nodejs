@@ -36,6 +36,13 @@ const existeProducto = async(id) => {
     }
 }
 
+const coleccionesPermitidas = (coleccion = '', colecciones = []) => {
+    if(!colecciones.includes(coleccion)){
+        throw new Error(`La coleccion ${coleccion} no es permitida, ${colecciones}`);
+    }
+    return true; // Hay que agregar un return TRUE porque estamos enviando una funcion con argumentos.
+}
+
 
 
 
@@ -44,5 +51,6 @@ module.exports = {
     emailExiste,
     existeUsuarioporID,
     existeCategoria,
-    existeProducto
+    existeProducto,
+    coleccionesPermitidas
 }
